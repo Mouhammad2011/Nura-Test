@@ -3661,51 +3661,78 @@ async function handleFilePanelImport(inp){
   updateFilePanelUI();
 }
 
-async function handleFilePanelPaste(){
-  try{
+async function handleFilePanelPaste() {
+  try {
     const text = await navigator.clipboard.readText();
-    if(!text.trim()){ showPaperModal('Clipboard is empty or contains no text.', false, null, null); return; }
+    if (!text.trim()) {
+      showPaperModal('Clipboard is empty or contains no text.', false, null, null);
+      return;
+    }
     const name = `[Pasted] ${new Date().toLocaleTimeString()}`;
-    loadedFiles.unshift({name, size:text.length, type:'text', text});
-    if(loadedFiles.length > 10) loadedFiles = loadedFiles.slice(0,10);
+    loadedFiles.unshift({
+      name,
+      size: text.length,
+      type: 'text',
+      text
+    });
+    if (loadedFiles.length > 10) loadedFiles = loadedFiles.slice(0, 10);
     updateFilePanelUI();
-    
+
     // Fallback prompt if clipboard API denied
     showPaperModal('Paste your text below:', true, '', (text) => {
-      if(text && text.trim()){
+      if (text && text.trim()) {
         const name = `[Pasted] ${new Date().toLocaleTimeString()}`;
-        loadedFiles.unshift({name, size:text.length, type:'text', text});
+        loadedFiles.unshift({
+          name,
+          size: text.length,
+          type: 'text',
+          text
+        });
         updateFilePanelUI();
       }
     });
   } catch (err) {
     console.error("Paste failed:", err);
-    // You can add an optional user alert here if you want
   }
 }
+
 // Drag-and-drop on file side panel dropzone
-window.addEventListener('DOMContentLoaded', ()=>{
+window.addEventListener('DOMContentLoaded', () => {
   const dz = document.getElementById('fsp-dropzone');
-  if(!dz) return;
-  dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('drag-over'); });
-  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
-  dz.addEventListener('drop', e=>{
-    e.preventDefault(); dz.classList.remove('drag-over');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => {
+    e.preventDefault();
+    dz.classList.add('drag-over');
+  });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
     const dt = e.dataTransfer;
-    if(dt.files.length){
+    if (dt.files.length) {
       // inject into our handler
-      handleFilePanelImport({files: dt.files, value:''});
-    } else if(dt.getData('text')){
+      handleFilePanelImport({
+        files: dt.files,
+        value: ''
+      });
+    } else if (dt.getData('text')) {
       const text = dt.getData('text');
       const name = `[Dropped text] ${new Date().toLocaleTimeString()}`;
-      loadedFiles.unshift({name, size:text.length, type:'text', text});
+      loadedFiles.unshift({
+        name,
+        size: text.length,
+        type: 'text',
+        text
+      });
       updateFilePanelUI();
     }
   });
 });
 
 // ─── keep old processLectureFiles wired so nothing breaks ───
-async function processLectureFiles(inp){ await handleFilePanelImport(inp); }
+async function processLectureFiles(inp) {
+  await handleFilePanelImport(inp);
+}
 
 // ═══════════════════════════════════════════════
 // NURA WATCH — AI State Monitor (rewritten)

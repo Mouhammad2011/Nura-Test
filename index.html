@@ -3669,6 +3669,7 @@ async function handleFilePanelPaste(){
     loadedFiles.unshift({name, size:text.length, type:'text', text});
     if(loadedFiles.length > 10) loadedFiles = loadedFiles.slice(0,10);
     updateFilePanelUI();
+    
     // Fallback prompt if clipboard API denied
     showPaperModal('Paste your text below:', true, '', (text) => {
       if(text && text.trim()){
@@ -3677,9 +3678,11 @@ async function handleFilePanelPaste(){
         updateFilePanelUI();
       }
     });
+  } catch (err) {
+    console.error("Paste failed:", err);
+    // You can add an optional user alert here if you want
   }
 }
-
 // Drag-and-drop on file side panel dropzone
 window.addEventListener('DOMContentLoaded', ()=>{
   const dz = document.getElementById('fsp-dropzone');
